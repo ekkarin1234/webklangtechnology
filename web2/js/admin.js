@@ -90,19 +90,33 @@
       return new Promise((res, rej) => { const r = new FileReader(); r.onload = () => res(r.result); r.onerror = rej; r.readAsDataURL(file); });
     }
     const url = URL.createObjectURL(file);
-    try {
-      const img = await new Promise((res, rej) => { const i = new Image(); i.onload = () => res(i); i.onerror = rej; i.src = url; });
-      const k = Math.min(1, 1600 / Math.max(img.naturalWidth, img.naturalHeight));
-      const c = document.createElement('canvas');
-      c.width = Math.round(img.naturalWidth * k); c.height = Math.round(img.naturalHeight * k);
-      const x = c.getContext('2d'); x.imageSmoothingQuality = 'high'; x.drawImage(img, 0, 0, c.width, c.height);
-      // Images end up inside content.json, so keep them small: WebP keeps PNG transparency; browsers without WebP encoding fall back to PNG.
-      if (file.type === 'image/png' || file.type === 'image/webp') {
-        const w = c.toDataURL('image/webp', 0.85);
-        return w.startsWith('data:image/webp') ? w : c.toDataURL('image/png');
-      }
-      return c.toDataURL('image/jpeg', 0.82);
-    } finally { URL.revokeObjectURL(url); }
+    try { return await compressImage(url, file.type === 'image/png' || file.type === 'image/webp'); }
+    finally { URL.revokeObjectURL(url); }
+  }
+
+  // Images end up inside content.json, so keep them small: WebP keeps PNG transparency; browsers without WebP encoding fall back to PNG.
+  async function compressImage(src, keepAlpha) {
+    const img = await new Promise((res, rej) => { const i = new Image(); i.onload = () => res(i); i.onerror = rej; i.src = src; });
+    const k = Math.min(1, 1600 / Math.max(img.naturalWidth, img.naturalHeight));
+    const c = document.createElement('canvas');
+    c.width = Math.round(img.naturalWidth * k); c.height = Math.round(img.naturalHeight * k);
+    const x = c.getContext('2d'); x.imageSmoothingQuality = 'high'; x.drawImage(img, 0, 0, c.width, c.height);
+    if (keepAlpha) {
+      const w = c.toDataURL('image/webp', 0.85);
+      return w.startsWith('data:image/webp') ? w : c.toDataURL('image/png');
+    }
+    return c.toDataURL('image/jpeg', 0.82);
+  }
+
+  // Re-compress any large embedded image (e.g. ones uploaded before compression existed) so content.json stays light.
+  async function shrinkImages(o) {
+    if (typeof o === 'string') {
+      if (!/^data:image\/(png|jpeg|webp);/.test(o) || o.length < 400000) return o;
+      try { const s = await compressImage(o, !o.startsWith('data:image/jpeg')); return s.length < o.length ? s : o; } catch (e) { return o; }
+    }
+    if (Array.isArray(o)) { const r = []; for (const v of o) r.push(await shrinkImages(v)); return r; }
+    if (o && typeof o === 'object') { const r = {}; for (const k in o) r[k] = await shrinkImages(o[k]); return r; }
+    return o;
   }
 
   // ---------- state ----------
@@ -341,7 +355,7 @@
   async function save() {
     if (S.saving) return;
     S.saving = true; renderTop();
-    try { const at = await CMS.save(S.draft); S.draft = { ...S.draft, updatedAt: at }; S.dirty = false; toast('บันทึกแล้ว · หน้าเว็บอัปเดตทันที'); }
+    try { S.draft = await shrinkImages(S.draft); const at = await CMS.save(S.draft); S.draft = { ...S.draft, updatedAt: at }; S.dirty = false; toast('บันทึกแล้ว · หน้าเว็บอัปเดตทันที'); }
     catch (e) { toast('บันทึกไม่สำเร็จ'); }
     S.saving = false; renderTop(); renderAside();
     if (currentSection().kind === 'dashboard') renderContent();
@@ -402,8 +416,10 @@
         renderAside(); renderContent(); CMS.saveRequests(S.requests); break;
       }
       case 'export': {
-        const blob = new Blob([JSON.stringify(S.draft, null, 2)], { type: 'application/json' });
-        const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `kts-content-${new Date().toISOString().slice(0, 10)}.json`; a.click();
+        toast('กำลังเตรียมไฟล์…');
+        const blob = new Blob([JSON.stringify(await shrinkImages(S.draft), null, 2)], { type: 'application/json' });
+        // named content.json so it can be dropped straight into web2/ of the repo
+        const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'content.json'; a.click();
         setTimeout(() => URL.revokeObjectURL(a.href), 1000); break;
       }
       case 'reset':
