@@ -12,8 +12,8 @@
   function catalogOf(c) {
     const out = [];
     (c.boats.items || []).forEach(b => out.push({ id: b.id, name: `${c.boats.name || ''} รุ่น ${b.m}`, sub: b.sub, unit: c.boats.unit, img: b.img }));
-    (c.floodwall.items || []).forEach(f => out.push({ id: f.id, name: `${c.floodwall.name || ''} ${f.name}`, sub: `${f.dim} · ${f.kg}`, unit: c.floodwall.unit, img: f.img }));
     if (c.pump.name) out.push({ id: 'pump', name: c.pump.name, sub: c.pump.quoteSub, unit: c.pump.unit, img: c.pump.img });
+    (c.floodwall.items || []).forEach(f => out.push({ id: f.id, name: `${c.floodwall.name || ''} ${f.name}`, sub: `${f.dim} · ${f.kg}`, unit: c.floodwall.unit, img: f.img }));
     return out;
   }
   const quoteItems = () => catalogOf(state.c).filter(x => state.quote[x.id]).map(x => ({ ...x, qty: state.quote[x.id] }));
@@ -57,8 +57,10 @@
     </div></header>`;
   }
 
-  function catHead(sec) {
-    return `<div class="cat-head"><div><span class="cat-tag">${esc(sec.tag)}</span><h3>${esc(sec.title)}</h3></div><span class="cat-meta">${esc(sec.meta)}</span></div>`;
+  // The leading number of a category tag follows its position on the page, so reordering sections doesn't need a content edit.
+  function catHead(sec, n) {
+    const tag = n ? String(sec.tag || '').replace(/^\d+/, String(n).padStart(2, '0')) : sec.tag;
+    return `<div class="cat-head"><div><span class="cat-tag">${esc(tag)}</span><h3>${esc(sec.title)}</h3></div><span class="cat-meta">${esc(sec.meta)}</span></div>`;
   }
 
   function home(c) {
@@ -159,19 +161,9 @@
     <p class="lead">${esc(c.products.intro)}</p>
   </div>
 
-  <div id="boats" class="cat">${catHead(c.boats)}<div class="boat-grid">${boats}</div></div>
+  <div id="boats" class="cat">${catHead(c.boats, 1)}<div class="boat-grid">${boats}</div></div>
 
-  <div id="floodwall" class="cat">${catHead(c.floodwall)}
-    <div class="wall-layout">
-      <div class="spec-box">
-        <b>${esc(c.floodwall.specTitle)}</b>
-        <div class="spec-rows">${wallSpecs}<div class="spec-dims"><span>${esc(c.floodwall.dimsTitle)}</span>${wallDims}</div></div>
-      </div>
-      <div class="wall-grid">${wallCards}</div>
-    </div>
-  </div>
-
-  <div id="pump" class="cat">${catHead(c.pump)}
+  <div id="pump" class="cat">${catHead(c.pump, 2)}
     <div class="pump-card">
       <div class="pump-media"><img src="${esc(c.pump.img)}" alt="${esc(c.pump.name)}" loading="lazy"></div>
       <div class="pump-info">
@@ -182,6 +174,16 @@
       </div>
     </div>
     <div class="acc"><b>${esc(c.pump.accTitle)}</b><div class="acc-grid">${acc}</div></div>
+  </div>
+
+  <div id="floodwall" class="cat">${catHead(c.floodwall, 3)}
+    <div class="wall-layout">
+      <div class="spec-box">
+        <b>${esc(c.floodwall.specTitle)}</b>
+        <div class="spec-rows">${wallSpecs}<div class="spec-dims"><span>${esc(c.floodwall.dimsTitle)}</span>${wallDims}</div></div>
+      </div>
+      <div class="wall-grid">${wallCards}</div>
+    </div>
   </div>
 </div></section>
 

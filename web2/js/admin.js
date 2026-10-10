@@ -49,13 +49,7 @@
         A('line1', 'รายละเอียด บรรทัด 1', '', 2), A('line2', 'รายละเอียด บรรทัด 2', '', 2), A('line3', 'รายละเอียด บรรทัด 3', '', 2),
       ], blank: () => ({ id: 'B-' + Date.now(), m: 'รุ่นใหม่', sub: '', img: '', hasEng: false, mold: false, len: '', w: '', h: '', line1: '', line2: '', line3: '' }) },
     ] },
-    { key: 'floodwall', label: 'กำแพงกั้นน้ำ', desc: 'หมวด 02 · กั้นน้ำ', fields: [
-      T('floodwall.tag', 'ป้ายหมวด'), T('floodwall.title', 'หัวข้อหมวด'), T('floodwall.meta', 'ข้อความด้านขวาหัวข้อ'), T('floodwall.name', 'ชื่อสินค้า'),
-      T('floodwall.unit', 'หน่วยนับ'), T('floodwall.specTitle', 'หัวข้อกล่องคุณลักษณะ'), T('floodwall.dimsTitle', 'หัวข้อขนาด/น้ำหนัก'),
-      { p: 'floodwall.specs', l: 'คุณลักษณะ', t: 'list', titleFn: it => `${it.k || '-'}: ${it.v || ''}`, item: KV, blank: () => ({ k: '', v: '' }) },
-      { p: 'floodwall.items', l: 'แบบกำแพงกั้นน้ำ', t: 'list', titleKey: 'name', item: [T('name', 'ชื่อแบบ'), T('dim', 'ขนาด'), T('kg', 'น้ำหนัก'), I('img', 'รูปสินค้า')], blank: () => ({ id: 'FW-' + Date.now(), name: 'แบบใหม่', dim: '', kg: '', img: '' }) },
-    ] },
-    { key: 'pump', label: 'เครื่องสูบระบายน้ำ', desc: 'หมวด 03 · ระบายน้ำ', fields: [
+    { key: 'pump', label: 'เครื่องสูบระบายน้ำ', desc: 'หมวด 02 · ระบายน้ำ', fields: [
       T('pump.tag', 'ป้ายหมวด'), T('pump.title', 'หัวข้อหมวด'), A('pump.meta', 'ข้อความด้านขวาหัวข้อ', '', 2), I('pump.img', 'รูปเครื่องสูบ'),
       T('pump.name', 'ชื่อสินค้า (ใช้ในใบเสนอราคา)'), T('pump.quoteSub', 'คำอธิบายสั้น'), T('pump.unit', 'หน่วยนับ'),
       { p: 'pump.stats', l: 'ตัวเลขเด่น', t: 'list', titleFn: it => `${it.k || '-'}: ${it.v || ''}`, item: [T('k', 'หัวข้อ'), T('v', 'ค่า'), T('sub', 'หมายเหตุใต้ค่า')], blank: () => ({ k: '', v: '', sub: '' }) },
@@ -63,6 +57,12 @@
       T('pump.notePrefix', 'กล่องแนะนำ: ข้อความนำ'), T('pump.noteStrong', 'กล่องแนะนำ: ตัวหนา'), T('pump.noteSuffix', 'กล่องแนะนำ: ข้อความต่อท้าย'),
       T('pump.accTitle', 'หัวข้ออุปกรณ์ประกอบ'),
       { p: 'pump.accessories', l: 'อุปกรณ์ประกอบ', t: 'list', titleKey: 'title', item: [T('title', 'ชื่ออุปกรณ์'), I('img', 'รูป'), Bo('contain', 'แสดงรูปทั้งหมด (ไม่ครอบตัด)'), T('bg', 'สีพื้นหลังรูป', 'เช่น #A0A0A1')], blank: () => ({ title: 'อุปกรณ์ใหม่', img: '', contain: false, bg: '' }) },
+    ] },
+    { key: 'floodwall', label: 'กำแพงกั้นน้ำ', desc: 'หมวด 03 · กั้นน้ำ', fields: [
+      T('floodwall.tag', 'ป้ายหมวด'), T('floodwall.title', 'หัวข้อหมวด'), T('floodwall.meta', 'ข้อความด้านขวาหัวข้อ'), T('floodwall.name', 'ชื่อสินค้า'),
+      T('floodwall.unit', 'หน่วยนับ'), T('floodwall.specTitle', 'หัวข้อกล่องคุณลักษณะ'), T('floodwall.dimsTitle', 'หัวข้อขนาด/น้ำหนัก'),
+      { p: 'floodwall.specs', l: 'คุณลักษณะ', t: 'list', titleFn: it => `${it.k || '-'}: ${it.v || ''}`, item: KV, blank: () => ({ k: '', v: '' }) },
+      { p: 'floodwall.items', l: 'แบบกำแพงกั้นน้ำ', t: 'list', titleKey: 'name', item: [T('name', 'ชื่อแบบ'), T('dim', 'ขนาด'), T('kg', 'น้ำหนัก'), I('img', 'รูปสินค้า')], blank: () => ({ id: 'FW-' + Date.now(), name: 'แบบใหม่', dim: '', kg: '', img: '' }) },
     ] },
     { g: 'ส่วนอื่น ๆ' },
     { key: 'cta', label: 'แถบชวนขอใบเสนอราคา', fields: [A('cta.title', 'หัวข้อ', '', 2), A('cta.text', 'ข้อความ', '', 2), T('cta.button', 'ข้อความปุ่ม')] },
