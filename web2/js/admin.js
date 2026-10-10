@@ -92,11 +92,16 @@
     const url = URL.createObjectURL(file);
     try {
       const img = await new Promise((res, rej) => { const i = new Image(); i.onload = () => res(i); i.onerror = rej; i.src = url; });
-      const k = Math.min(1, 2200 / Math.max(img.naturalWidth, img.naturalHeight));
+      const k = Math.min(1, 1600 / Math.max(img.naturalWidth, img.naturalHeight));
       const c = document.createElement('canvas');
       c.width = Math.round(img.naturalWidth * k); c.height = Math.round(img.naturalHeight * k);
       const x = c.getContext('2d'); x.imageSmoothingQuality = 'high'; x.drawImage(img, 0, 0, c.width, c.height);
-      return file.type === 'image/png' || file.type === 'image/webp' ? c.toDataURL('image/png') : c.toDataURL('image/jpeg', 0.9);
+      // Images end up inside content.json, so keep them small: WebP keeps PNG transparency; browsers without WebP encoding fall back to PNG.
+      if (file.type === 'image/png' || file.type === 'image/webp') {
+        const w = c.toDataURL('image/webp', 0.85);
+        return w.startsWith('data:image/webp') ? w : c.toDataURL('image/png');
+      }
+      return c.toDataURL('image/jpeg', 0.82);
     } finally { URL.revokeObjectURL(url); }
   }
 
