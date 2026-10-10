@@ -132,7 +132,14 @@
 
   window.KTSCMS = {
     DEFAULTS, clone,
-    async load() { let v = null; try { v = await get('content'); } catch (e) {} return merge(DEFAULTS, v || {}); },
+    // Published content (content.json in the repo) is what every visitor sees; a newer local admin save wins on that browser only.
+    async load() {
+      let local = null, pub = null;
+      try { local = await get('content'); } catch (e) {}
+      try { const r = await fetch('./content.json', { cache: 'no-cache' }); if (r.ok) pub = await r.json(); } catch (e) {}
+      const v = local && (!pub || (local.updatedAt || '') > (pub.updatedAt || '')) ? local : pub;
+      return merge(DEFAULTS, v || {});
+    },
     async save(c) { c.updatedAt = new Date().toISOString(); await set('content', clone(c)); ping('content'); return c.updatedAt; },
     async reset() { await set('content', null); ping('content'); },
     async listRequests() { try { return (await get('requests')) || []; } catch (e) { return []; } },
