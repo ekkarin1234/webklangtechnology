@@ -373,15 +373,43 @@
     else if (act === 'reset') { state.sent = false; state.quote = {}; render(); }
   });
 
-  app.addEventListener('submit', e => {
+  // Quote requests are emailed via FormSubmit (no backend on this static site).
+  const QUOTE_ENDPOINT = 'https://formsubmit.co/ajax/klangtechnology@gmail.com';
+  const sendQuoteMail = req => fetch(QUOTE_ENDPOINT, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+    body: JSON.stringify({
+      _subject: `ขอใบเสนอราคา ${req.ref} · ${req.org}`,
+      _template: 'table',
+      ...(req.email ? { _replyto: req.email } : {}),
+      'เลขที่คำขอ': req.ref,
+      'รายการสินค้า': req.items.length ? req.items.map(x => `${x.name}${x.sub ? ` (${x.sub})` : ''} × ${x.qty} ${x.unit}`).join('\n') : '-',
+      'เอกสารที่ต้องการ': req.docs.join(', ') || '-',
+      'ประเภทหน่วยงาน': req.orgType, 'ชื่อหน่วยงาน / บริษัท': req.org, 'เลขประจำตัวผู้เสียภาษี': req.taxId || '-',
+      'ชื่อผู้ติดต่อ': req.contact, 'ตำแหน่ง': req.position || '-', 'เบอร์โทร': req.phone, 'อีเมล': req.email || '-',
+      'จังหวัดที่จัดส่ง': req.province, 'ต้องการรับสินค้าภายใน': req.needBy || '-', 'รายละเอียดเพิ่มเติม': req.note || '-',
+    }),
+  }).then(r => r.json()).then(j => { if (String(j.success) !== 'true') throw new Error(j.message || 'send failed'); });
+
+  app.addEventListener('submit', async e => {
     if (e.target.id !== 'quote-form') return;
     e.preventDefault();
+    const btn = e.target.querySelector('.submit');
+    if (btn.disabled) return;
     const fd = new FormData(e.target);
     const data = {};
     fd.forEach((v, k) => { if (k !== 'docs') data[k] = v; });
     const ref = 'KTS-' + String(Date.now()).slice(-6);
     const req = { ref, at: new Date().toISOString(), status: 'new', ...data, docs: fd.getAll('docs'),
       items: quoteItems().map(x => ({ name: x.name, sub: x.sub, qty: x.qty, unit: x.unit })) };
+    const label = btn.textContent;
+    btn.disabled = true; btn.textContent = 'กำลังส่ง…';
+    try { await sendQuoteMail(req); }
+    catch (err) {
+      btn.disabled = false; btn.textContent = label;
+      alert(`ส่งคำขอไม่สำเร็จ กรุณาลองใหม่อีกครั้ง หรือติดต่อ ${state.c.contact.phone}`);
+      return;
+    }
     window.KTSCMS.addRequest(req).catch(() => {});
     state.sent = true; state.refNo = ref;
     render(); window.scrollTo({ top: 0, behavior: 'instant' });
