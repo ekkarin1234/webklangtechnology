@@ -8,12 +8,14 @@ export default async function handler(req, res) {
   apiHeaders(res);
 
   if (req.method === 'GET') {
-    // ?fresh=1 is used by the admin to see its own save immediately; visitors get a CDN-cached copy (refreshed every ~30 s).
-    res.setHeader('Cache-Control', req.query.fresh ? 'no-store' : 'public, max-age=0, s-maxage=30, stale-while-revalidate=86400');
+    // errors and "empty" must never be cached, or the CDN keeps serving them after the first save
+    res.setHeader('Cache-Control', 'no-store');
     try {
       const meta = await head(KEY);
       const r = await fetch(`${meta.url}?v=${new Date(meta.uploadedAt).getTime()}`, { cache: 'no-store' });
       if (!r.ok) throw new Error(`blob fetch ${r.status}`);
+      // ?fresh=1 is used by the admin to see its own save immediately; visitors get a CDN-cached copy (refreshed every ~30 s).
+      if (!req.query.fresh) res.setHeader('Cache-Control', 'public, max-age=0, s-maxage=30, stale-while-revalidate=300');
       res.setHeader('Content-Type', 'application/json; charset=utf-8');
       return res.status(200).send(await r.text());
     } catch (e) {
