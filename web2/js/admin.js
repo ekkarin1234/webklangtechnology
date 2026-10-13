@@ -9,6 +9,9 @@
   const L = (p, l, h) => ({ p, l, t: 'lines', h });
   const I = (p, l, h) => ({ p, l, t: 'image', h });
   const Bo = (p, l) => ({ p, l, t: 'bool' });
+  // opts: [[value, label], ...]; norm maps a stored value (e.g. legacy true/false) to an option value
+  const Sel = (p, l, opts, norm) => ({ p, l, t: 'select', opts, norm });
+  const moldValue = v => v === true || v === 'yes' ? 'yes' : v === 'wait' ? 'wait' : '';
   const KV = [T('k', 'หัวข้อ'), T('v', 'ค่า')];
 
   const SECTIONS = [
@@ -41,13 +44,14 @@
     { key: 'products', label: 'หัวข้อส่วนสินค้า', fields: [T('products.eyebrow', 'หัวข้อเล็ก'), T('products.title', 'หัวข้อใหญ่'), A('products.intro', 'คำอธิบาย')] },
     { key: 'boats', label: 'เรือท้องแบน', desc: 'หมวด 01 · ช่วยเหลือและอพยพ', fields: [
       T('boats.tag', 'ป้ายหมวด'), T('boats.title', 'หัวข้อหมวด'), T('boats.meta', 'ข้อความด้านขวาหัวข้อ'), T('boats.name', 'ชื่อสินค้า (นำหน้าชื่อรุ่น)'),
-      T('boats.unit', 'หน่วยนับ'), T('boats.moldLabel', 'ป้าย “มีแม่พิมพ์ขึ้นรูป”'), T('boats.engLabel', 'ป้าย “พร้อมเครื่องยนต์”'), T('boats.hullLabel', 'ป้าย “เฉพาะตัวเรือ”'),
+      T('boats.unit', 'หน่วยนับ'), T('boats.moldLabel', 'ป้าย “มีแม่พิมพ์ขึ้นรูป”'), T('boats.moldWaitLabel', 'ป้าย “รอแม่พิมพ์ขึ้นรูป”'), T('boats.engLabel', 'ป้าย “พร้อมเครื่องยนต์”'), T('boats.hullLabel', 'ป้าย “เฉพาะตัวเรือ”'),
       { p: 'boats.items', l: 'รายการเรือ', t: 'list', titleFn: it => `รุ่น ${it.m || '-'} · ${it.sub || ''}`, item: [
         T('m', 'รุ่น'), T('sub', 'คำอธิบายสั้น (ใช้ในใบเสนอราคา)'), I('img', 'รูปสินค้า'),
-        Bo('hasEng', 'พร้อมเครื่องยนต์'), Bo('mold', 'แสดงป้ายมีแม่พิมพ์ขึ้นรูป'),
+        Bo('hasEng', 'พร้อมเครื่องยนต์'),
+        Sel('mold', 'ป้ายแม่พิมพ์', [['', '— ไม่แสดงป้าย —'], ['yes', 'มีแม่พิมพ์ขึ้นรูป'], ['wait', 'สินค้ารอแม่พิมพ์ขึ้นรูป']], moldValue),
         T('len', 'ความยาว (ม.)'), T('w', 'ความกว้าง (ม.)'), T('h', 'ความสูงขอบนอก (ม.)'),
         A('line1', 'รายละเอียด บรรทัด 1', '', 2), A('line2', 'รายละเอียด บรรทัด 2', '', 2), A('line3', 'รายละเอียด บรรทัด 3', '', 2),
-      ], blank: () => ({ id: 'B-' + Date.now(), m: 'รุ่นใหม่', sub: '', img: '', hasEng: false, mold: false, len: '', w: '', h: '', line1: '', line2: '', line3: '' }) },
+      ], blank: () => ({ id: 'B-' + Date.now(), m: 'รุ่นใหม่', sub: '', img: '', hasEng: false, mold: '', len: '', w: '', h: '', line1: '', line2: '', line3: '' }) },
     ] },
     { key: 'pump', label: 'เครื่องสูบระบายน้ำ', desc: 'หมวด 02 · ระบายน้ำ', fields: [
       T('pump.tag', 'ป้ายหมวด'), T('pump.title', 'หัวข้อหมวด'), A('pump.meta', 'ข้อความด้านขวาหัวข้อ', '', 2), I('pump.img', 'รูปเครื่องสูบ'),
@@ -63,6 +67,16 @@
       T('floodwall.unit', 'หน่วยนับ'), T('floodwall.specTitle', 'หัวข้อกล่องคุณลักษณะ'), T('floodwall.dimsTitle', 'หัวข้อขนาด/น้ำหนัก'),
       { p: 'floodwall.specs', l: 'คุณลักษณะ', t: 'list', titleFn: it => `${it.k || '-'}: ${it.v || ''}`, item: KV, blank: () => ({ k: '', v: '' }) },
       { p: 'floodwall.items', l: 'แบบกำแพงกั้นน้ำ', t: 'list', titleKey: 'name', item: [T('name', 'ชื่อแบบ'), T('dim', 'ขนาด'), T('kg', 'น้ำหนัก'), I('img', 'รูปสินค้า')], blank: () => ({ id: 'FW-' + Date.now(), name: 'แบบใหม่', dim: '', kg: '', img: '' }) },
+    ] },
+    { g: 'บทความ' },
+    { key: 'articles', label: 'บทความ', desc: 'แสดง 4 บทความแรกในหน้าแรก (ส่วนล่าง ก่อนแถบขอใบเสนอราคาและ Footer) · กดอ่านต่อเพื่อเปิดหน้าบทความเต็ม', fields: [
+      T('articles.eyebrow', 'หัวข้อเล็ก'), T('articles.title', 'หัวข้อใหญ่'), T('articles.more', 'ข้อความปุ่มอ่านต่อ'),
+      T('articles.back', 'ข้อความปุ่มกลับ (หน้าบทความ)'), T('articles.otherTitle', 'หัวข้อบทความอื่น ๆ (ท้ายหน้าบทความ)'),
+      { p: 'articles.items', l: 'รายการบทความ', t: 'list', titleKey: 'title', item: [
+        T('title', 'ชื่อบทความ'), T('date', 'วันที่', 'เช่น 10 ต.ค. 2569'), I('img', 'รูปหน้าปก', 'แนะนำแนวนอน 16:10'),
+        A('excerpt', 'ตัวอย่างเนื้อหา (แสดงในการ์ดหน้าแรก)', 'เว้นว่างไว้ได้ ระบบจะใช้ย่อหน้าแรกของเนื้อหาแทน', 3),
+        A('body', 'เนื้อหาบทความเต็ม', 'เว้น 1 บรรทัดว่างเพื่อขึ้นย่อหน้าใหม่', 16),
+      ], blank: () => ({ id: 'A-' + Date.now(), title: 'บทความใหม่', date: '', img: '', excerpt: '', body: '' }) },
     ] },
     { g: 'ส่วนอื่น ๆ' },
     { key: 'cta', label: 'แถบชวนขอใบเสนอราคา', fields: [A('cta.title', 'หัวข้อ', '', 2), A('cta.text', 'ข้อความ', '', 2), T('cta.button', 'ข้อความปุ่ม')] },
@@ -121,9 +135,10 @@
 
   // ---------- state ----------
   let authed = false;
-  try { authed = sessionStorage.getItem('kts-admin') === '1'; } catch (e) {}
-  const S = { authed, err: '', section: 'dashboard', draft: CMS.clone(CMS.DEFAULTS), dirty: false, saving: false,
+  try { authed = CMS.hasSession() || sessionStorage.getItem('kts-admin') === '1'; } catch (e) {}
+  const S = { authed, err: '', loadErr: '', section: 'dashboard', draft: CMS.clone(CMS.DEFAULTS), dirty: false, saving: false,
     open: {}, busy: null, requests: [], reqFilter: 'all' };
+  const signOut = msg => { CMS.logout(); try { sessionStorage.removeItem('kts-admin'); } catch (e) {} S.authed = false; S.err = msg || ''; renderAll(); };
   const listDefs = {};
 
   let toastT = null;
@@ -155,6 +170,11 @@
     }
     if (f.t === 'bool') {
       return `<button type="button" class="f-bool" data-act="toggle" data-path="${esc(key)}" aria-pressed="${v ? 'true' : 'false'}"><span class="switch${v ? ' on' : ''}"><i></i></span>${esc(f.l)}</button>`;
+    }
+    if (f.t === 'select') {
+      const cur = f.norm ? f.norm(v) : (v == null ? '' : String(v));
+      const opts = f.opts.map(([val, lab]) => `<option value="${esc(val)}"${val === cur ? ' selected' : ''}>${esc(lab)}</option>`).join('');
+      return `<label class="f-label">${esc(f.l)}<select class="f-input" data-path="${esc(key)}">${opts}</select>${hint}</label>`;
     }
     if (f.t === 'image') {
       const label = S.busy === key ? 'กำลังอัปโหลด…' : (v ? 'เปลี่ยนรูป' : 'อัปโหลดรูป');
@@ -215,7 +235,7 @@
       <label>รหัสผ่าน<input type="password" id="login-pw" autocomplete="current-password" autofocus></label>
       ${S.err ? `<span class="err" role="alert">${esc(S.err)}</span>` : ''}
       <button type="submit">เข้าสู่ระบบ</button>
-      <span class="hint">รหัสผ่านเริ่มต้น: kts1234 · เปลี่ยนได้ที่เมนูตั้งค่า</span>
+      ${CMS.isRemote() ? '' : '<span class="hint" id="login-hint">โหมดทดสอบในเครื่อง · รหัสผ่านเริ่มต้น: kts1234</span>'}
     </form></div>`;
   }
 
@@ -245,6 +265,7 @@
          <button class="btn-discard" data-act="discard">ยกเลิกการแก้ไข</button>
          <button class="btn-save" data-act="save">${S.saving ? 'กำลังบันทึก…' : 'บันทึก'}</button>`
       : `<span class="pill-ok">บันทึกแล้ว</span>`;
+    if (S.loadErr) return `<div class="topbar-in"><div class="ttl"><h1>${esc(sec.label)}</h1><span class="err" role="alert">${esc(S.loadErr)} · กรุณารีเฟรชหน้า (ปิดการบันทึกไว้เพื่อไม่ให้ทับเนื้อหาบนเว็บ)</span></div></div>`;
     return `<div class="topbar-in">
       <div class="ttl"><h1>${esc(sec.label)}</h1><span>${d.updatedAt ? `บันทึกล่าสุด ${esc(fmt(d.updatedAt))}` : 'ยังไม่เคยบันทึก · แสดงเนื้อหาเริ่มต้น'}</span></div>
       <div class="top-actions">${right}</div>
@@ -262,7 +283,7 @@
         <div class="kpi"><small>อัปเดตเนื้อหาล่าสุด</small><b class="sm">${d.updatedAt ? esc(fmt(d.updatedAt)) : 'ยังไม่เคยแก้ไข'}</b></div>
       </div>
       <div class="panel"><span class="panel-title">แก้ไขส่วนต่าง ๆ ของเว็บไซต์</span><div class="shortcuts">${shortcuts}</div></div>
-      <div class="howto">วิธีใช้: เลือกส่วนที่ต้องการทางซ้าย แก้ข้อความหรือกด “อัปโหลดรูปใหม่” แล้วกด <strong>บันทึก</strong> ด้านบน หน้าเว็บไซต์ที่เปิดอยู่จะอัปเดตทันที</div>`;
+      <div class="howto">วิธีใช้: เลือกส่วนที่ต้องการทางซ้าย แก้ข้อความหรือกด “อัปโหลดรูปใหม่” แล้วกด <strong>บันทึก</strong> ด้านบน ${CMS.isRemote() ? 'ผู้เข้าชมทุกคนจะเห็นเนื้อหาใหม่ภายในประมาณ 1 นาที' : '(โหมดทดสอบในเครื่อง: บันทึกเฉพาะเบราว์เซอร์นี้)'}</div>`;
   }
 
   function formView(sec) {
@@ -306,19 +327,26 @@
         </div>
       </article>`;
     }).join('');
-    return `<div class="filters">${filters}</div>
+    return `${CMS.isRemote() ? '<div class="howto">คำขอใบเสนอราคาจากเว็บไซต์จะถูกส่งเข้าอีเมลของบริษัท (ตั้งค่าไว้ในแบบฟอร์มหน้าเว็บ) · รายการด้านล่างแสดงเฉพาะคำขอที่ส่งจากเบราว์เซอร์นี้</div>' : ''}
+      <div class="filters">${filters}</div>
       ${reqs.length === 0 ? '<div class="req-empty">ยังไม่มีคำขอใบเสนอราคา · เมื่อมีผู้กรอกฟอร์มบนเว็บไซต์ รายการจะแสดงที่นี่</div>' : cards}`;
   }
 
   function settingsView() {
-    return `<form class="panel" id="pw-form">
+    const pwPanel = CMS.isRemote()
+      ? `<div class="panel">
+        <span class="panel-title">เปลี่ยนรหัสผ่าน</span>
+        <p>รหัสผ่านหลังบ้านเก็บไว้อย่างปลอดภัยที่ Vercel ไม่ได้อยู่ในหน้าเว็บ เปลี่ยนได้ที่ Vercel → โปรเจกต์ webklangtechnology → Settings → Environment Variables → แก้ค่า <b>ADMIN_PASSWORD</b> แล้วกด Redeploy</p>
+      </div>`
+      : `<form class="panel" id="pw-form">
         <span class="panel-title">เปลี่ยนรหัสผ่าน</span>
         <div class="set-grid">
           <label class="f-label">รหัสผ่านปัจจุบัน<input class="f-input" type="password" id="pw-cur" autocomplete="current-password"></label>
           <label class="f-label">รหัสผ่านใหม่ (อย่างน้อย 6 ตัว)<input class="f-input" type="password" id="pw-new" autocomplete="new-password"></label>
         </div>
         <button type="submit" class="btn-primary">บันทึกรหัสผ่านใหม่</button>
-      </form>
+      </form>`;
+    return `${pwPanel}
       <div class="panel">
         <span class="panel-title">สำรองและกู้คืนข้อมูล</span>
         <p>ดาวน์โหลดเนื้อหาทั้งหมด (รวมรูปภาพ) เป็นไฟล์ .json เก็บไว้ หรือนำเข้าไฟล์ที่สำรองไว้</p>
@@ -354,9 +382,17 @@
   // ---------- actions ----------
   async function save() {
     if (S.saving) return;
+    if (S.loadErr) { toast('โหลดเนื้อหาล่าสุดไม่สำเร็จ กรุณารีเฟรชหน้าก่อนบันทึก'); return; }
     S.saving = true; renderTop();
-    try { S.draft = await shrinkImages(S.draft); const at = await CMS.save(S.draft); S.draft = { ...S.draft, updatedAt: at }; S.dirty = false; toast('บันทึกแล้ว · หน้าเว็บอัปเดตทันที'); }
-    catch (e) { toast('บันทึกไม่สำเร็จ'); }
+    try {
+      S.draft = await CMS.save(await shrinkImages(S.draft)); S.dirty = false;
+      toast(CMS.isRemote() ? 'บันทึกแล้ว · ผู้เข้าชมจะเห็นภายในประมาณ 1 นาที' : 'บันทึกแล้ว (โหมดทดสอบ: เฉพาะเบราว์เซอร์นี้)');
+    } catch (e) {
+      S.saving = false;
+      // the edits stay in S.draft; after signing in again the user just presses save once more
+      if (e.auth) { signOut('เซสชันหมดอายุ กรุณาเข้าสู่ระบบใหม่ แล้วกดบันทึกอีกครั้ง (การแก้ไขยังอยู่)'); return; }
+      toast('บันทึกไม่สำเร็จ: ' + (e.message || 'ลองใหม่อีกครั้ง'));
+    }
     S.saving = false; renderTop(); renderAside();
     if (currentSection().kind === 'dashboard') renderContent();
   }
@@ -374,12 +410,11 @@
         S.section = key; renderAside(); renderTop(); renderContent(); window.scrollTo({ top: 0, behavior: 'instant' }); break;
       case 'logout':
         if (S.dirty && !window.confirm('มีการแก้ไขที่ยังไม่บันทึก ออกจากระบบเลยหรือไม่?')) return;
-        try { sessionStorage.removeItem('kts-admin'); } catch (er) {}
-        S.authed = false; renderAll(); break;
+        signOut(); break;
       case 'save': save(); break;
       case 'discard':
         if (!window.confirm('ยกเลิกการแก้ไขทั้งหมดที่ยังไม่บันทึก?')) return;
-        S.draft = await CMS.load(); S.dirty = false; S.open = {}; renderAll(); break;
+        S.draft = await CMS.load({ fresh: true }); S.dirty = false; S.open = {}; renderAll(); break;
       case 'toggle': { const p = P(t.dataset.path); upd(p, !getIn(S.draft, p)); renderContent(); break; }
       case 'clear': upd(P(t.dataset.path), ''); renderContent(); break;
       case 'li-toggle': S.open[key + '.' + idx] = !S.open[key + '.' + idx]; renderContent(); break;
@@ -424,7 +459,8 @@
       }
       case 'reset':
         if (!window.confirm('คืนค่าเนื้อหาและรูปภาพทั้งหมดเป็นค่าเริ่มต้น?')) return;
-        await CMS.reset(); S.draft = await CMS.load(); S.dirty = false; S.open = {}; renderAll(); toast('คืนค่าเริ่มต้นแล้ว'); break;
+        try { await CMS.reset(); } catch (er) { if (er.auth) { signOut('เซสชันหมดอายุ กรุณาเข้าสู่ระบบใหม่'); return; } toast('คืนค่าไม่สำเร็จ'); return; }
+        S.draft = await CMS.load({ fresh: true }); S.dirty = false; S.open = {}; renderAll(); toast('คืนค่าเริ่มต้นแล้ว'); break;
     }
   });
 
@@ -469,8 +505,9 @@
     e.preventDefault();
     if (e.target.id === 'login-form') {
       const pw = document.getElementById('login-pw').value;
-      const real = await CMS.getPassword();
-      if (pw === real) { try { sessionStorage.setItem('kts-admin', '1'); } catch (er) {} S.authed = true; S.err = ''; renderAll(); }
+      let ok = false;
+      try { ok = await CMS.login(pw); } catch (er) { S.err = 'ระบบยังไม่พร้อม: ' + er.message; renderAll(); return; }
+      if (ok) { if (!CMS.isRemote()) try { sessionStorage.setItem('kts-admin', '1'); } catch (er) {} S.authed = true; S.err = ''; renderAll(); }
       else { S.err = 'รหัสผ่านไม่ถูกต้อง'; renderAll(); }
     } else if (e.target.id === 'pw-form') {
       const cur = document.getElementById('pw-cur').value, nw = document.getElementById('pw-new').value;
@@ -485,12 +522,17 @@
 
   // ---------- boot ----------
   renderAll();
-  CMS.load().then(c => {
+  CMS.load({ fresh: true, strict: true }).then(c => {
+    // on the server a session is the signed token; an old local "logged in" flag doesn't count
+    if (CMS.isRemote() && !CMS.hasSession() && S.authed) { S.authed = false; renderAll(); }
     if (S.dirty) return;
     S.draft = c;
     if (S.authed) renderAll();
-    else { const img = app.querySelector('.login img'); if (img) img.src = c.logo; } // don't wipe a half-typed password
-  });
+    else { // don't wipe a half-typed password
+      const img = app.querySelector('.login img'); if (img) img.src = c.logo;
+      if (CMS.isRemote()) { const h = document.getElementById('login-hint'); if (h) h.remove(); }
+    }
+  }).catch(e => { S.loadErr = e.message || 'โหลดเนื้อหาไม่สำเร็จ'; renderAll(); });
   loadRequests();
   CMS.subscribe(m => { if (m.type === 'requests') loadRequests(); });
 })();

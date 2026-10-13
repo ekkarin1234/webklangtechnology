@@ -52,6 +52,7 @@
       </nav>
       <div class="header-actions">
         ${state.page === 'quote' ? `<button class="btn-back" data-act="home">← กลับหน้าสินค้า</button>` : ''}
+        ${state.page === 'article' ? `<button class="btn-back" data-act="home">← กลับหน้าแรก</button>` : ''}
         <button class="btn-quote" data-act="quote">${esc(c.nav.quote)} <span class="count-pill" data-slot="count">${quoteItems().length}</span></button>
       </div>
     </div></header>`;
@@ -83,7 +84,8 @@
         <div class="boat-media">
           <img src="${esc(b.img)}" alt="${esc(title)}" data-zoom="${esc(title + ' · ' + (b.sub || ''))}" loading="lazy">
           <div class="boat-model"><span class="bar"></span><span class="lbl"><span>${esc(b.m)}</span></span></div>
-          ${b.mold ? `<span class="mold">${esc(c.boats.moldLabel)}</span>` : ''}
+          ${b.mold === true || b.mold === 'yes' ? `<span class="mold">${esc(c.boats.moldLabel)}</span>`
+            : b.mold === 'wait' ? `<span class="mold wait">${esc(c.boats.moldWaitLabel || 'รอแม่พิมพ์ขึ้นรูป')}</span>` : ''}
         </div>
         <div class="boat-body">
           <div class="boat-title">
@@ -186,11 +188,62 @@
     </div>
   </div>
 </div></section>
-
+${articlesSection(c)}
 <section class="band cta"><div class="wrap">
   <div class="cta-copy"><h2>${esc(c.cta.title)}</h2><p>${esc(c.cta.text)}</p></div>
   <button class="btn-yellow" data-act="quote">${esc(c.cta.button)} (<span data-slot="count">${quoteItems().length}</span> รายการ)</button>
 </div></section>`;
+  }
+
+  // ---------- articles ----------
+  const articleList = c => ((c.articles && c.articles.items) || []).filter(a => a && a.title);
+  const paragraphs = s => String(s || '').split(/\n\s*\n/).map(p => p.trim()).filter(Boolean);
+  const excerptOf = a => a.excerpt || (() => { const p = paragraphs(a.body)[0] || ''; return p.length > 140 ? p.slice(0, 140).trim() + '…' : p; })();
+
+  function articleCard(c, a) {
+    return `<article class="art-card">
+      <button type="button" class="art-media" data-act="article" data-id="${esc(a.id)}" aria-label="${esc(a.title)}">${a.img ? `<img src="${esc(a.img)}" alt="" loading="lazy">` : ''}</button>
+      <div class="art-body">
+        ${a.date ? `<span class="art-date">${esc(a.date)}</span>` : ''}
+        <h3><button type="button" data-act="article" data-id="${esc(a.id)}">${esc(a.title)}</button></h3>
+        <p>${esc(excerptOf(a))}</p>
+        <button type="button" class="art-more" data-act="article" data-id="${esc(a.id)}">${esc(c.articles.more || 'อ่านต่อ')} →</button>
+      </div>
+    </article>`;
+  }
+
+  function articlesSection(c) {
+    const list = articleList(c).slice(0, 4);
+    if (!list.length) return '';
+    return `<section id="articles" class="articles"><div class="wrap">
+  <div class="articles-head">
+    <span class="eyebrow">${esc(c.articles.eyebrow)}</span>
+    <h2 class="h2">${esc(c.articles.title)}</h2>
+  </div>
+  <div class="art-grid">${list.map(a => articleCard(c, a)).join('')}</div>
+</div></section>`;
+  }
+
+  function articlePage(c) {
+    const list = articleList(c);
+    const a = list.find(x => x.id === state.articleId);
+    if (!a) return `<section class="article-page"><div class="wrap narrow"><p class="lead">ไม่พบบทความนี้</p><button class="btn-blue art-back" data-act="home">${esc(c.articles.back)}</button></div></section>`;
+    const others = list.filter(x => x !== a).slice(0, 3);
+    return `<section class="article-page"><div class="wrap narrow">
+  <button class="art-back-link" data-act="home">${esc(c.articles.back)}</button>
+  <header class="art-head">
+    <span class="eyebrow">${esc(c.articles.eyebrow)}</span>
+    <h1>${esc(a.title)}</h1>
+    ${a.date ? `<span class="art-date">${esc(a.date)}</span>` : ''}
+  </header>
+  ${a.img ? `<div class="art-hero"><img src="${esc(a.img)}" alt="${esc(a.title)}"></div>` : ''}
+  <div class="art-content">${paragraphs(a.body).map(p => `<p>${esc(p)}</p>`).join('')}</div>
+</div>
+${others.length ? `<div class="wrap art-others">
+  <h2>${esc(c.articles.otherTitle)}</h2>
+  <div class="art-grid three">${others.map(x => articleCard(c, x)).join('')}</div>
+</div>` : ''}
+</section>`;
   }
 
   function quoteItemsCard() {
@@ -312,8 +365,12 @@
   // ---------- render ----------
   function render() {
     const c = state.c;
-    app.innerHTML = topbar(c) + header(c) + (state.page === 'home' ? home(c) : quotePage(c)) + footer(c);
+    const page = state.page === 'quote' ? quotePage(c) : state.page === 'article' ? articlePage(c) : home(c);
+    app.innerHTML = topbar(c) + header(c) + page + footer(c);
+    const a = state.page === 'article' && articleList(c).find(x => x.id === state.articleId);
+    document.title = a ? `${a.title} · KTS` : baseTitle;
   }
+  const baseTitle = document.title;
 
   function refreshQty() {
     const n = quoteItems().length;
@@ -329,9 +386,30 @@
     refreshQty();
   }
 
-  function go(page) { state.page = page; render(); window.scrollTo({ top: 0, behavior: 'instant' }); }
+  // Article pages live at #article/<id> so they can be linked to and the browser Back button works.
+  const ARTICLE_HASH = /^#article\/(.+)$/;
+  const leaveArticleHash = () => { if (ARTICLE_HASH.test(location.hash)) history.pushState(null, '', location.pathname + location.search); };
+  function route() {
+    const m = location.hash.match(ARTICLE_HASH);
+    if (m) { state.page = 'article'; state.articleId = decodeURIComponent(m[1]); }
+    else if (state.page === 'article') { // browser Back: return to the article cards
+      state.page = 'home'; render();
+      // run after the browser's own scroll restoration for the history entry
+      const toCards = () => { const el = document.getElementById('articles'); if (el) window.scrollTo({ top: el.getBoundingClientRect().top + window.scrollY - 70, behavior: 'instant' }); };
+      toCards(); setTimeout(toCards, 60);
+      return true;
+    }
+    else return false;
+    render(); window.scrollTo({ top: 0, behavior: 'instant' });
+    return true;
+  }
+  window.addEventListener('hashchange', route);
+  window.addEventListener('popstate', route);
+
+  function go(page) { leaveArticleHash(); state.page = page; render(); window.scrollTo({ top: 0, behavior: 'instant' }); }
 
   function navTo(id) {
+    leaveArticleHash();
     const jump = behavior => { const el = document.getElementById(id); if (el) window.scrollTo({ top: el.getBoundingClientRect().top + window.scrollY - 70, behavior }); };
     if (state.page === 'home') { jump('smooth'); return; }
     state.page = 'home'; render();
@@ -368,6 +446,7 @@
     const act = t.dataset.act;
     if (act === 'home') go('home');
     else if (act === 'quote') go('quote');
+    else if (act === 'article') location.hash = 'article/' + encodeURIComponent(t.dataset.id);
     else if (act === 'nav') navTo(t.dataset.to);
     else if (act === 'inc') setQty(t.dataset.id, 1);
     else if (act === 'dec') setQty(t.dataset.id, -1);
@@ -418,7 +497,7 @@
   });
 
   // ---------- boot ----------
-  render();
+  if (!route()) render();
   const jumpToHash = () => { const el = location.hash.length > 1 && document.getElementById(location.hash.slice(1)); if (el) window.scrollTo({ top: el.getBoundingClientRect().top + window.scrollY - 70, behavior: 'instant' }); };
   if (location.hash.length > 1) { if ('scrollRestoration' in history) history.scrollRestoration = 'manual'; window.addEventListener('load', () => setTimeout(jumpToHash, 50)); }
   const reload = () => window.KTSCMS.load().then(c => {

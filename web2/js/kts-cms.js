@@ -56,7 +56,7 @@
     boats: {
       tag: '01 · ช่วยเหลือและอพยพ', title: 'เรือท้องแบนอลูมิเนียม SAKUN C Tiny Boat', meta: '5 รุ่น · T046 · T054 · T061 · T064 · T065',
       name: 'เรือท้องแบนอลูมิเนียม SAKUN C Tiny Boat', unit: 'ลำ',
-      moldLabel: 'มีแม่พิมพ์ขึ้นรูป', engLabel: 'พร้อมเครื่องยนต์ OUTBOARD', hullLabel: 'เฉพาะตัวเรือ ไม่มีเครื่องยนต์',
+      moldLabel: 'มีแม่พิมพ์ขึ้นรูป', moldWaitLabel: 'รอแม่พิมพ์ขึ้นรูป', engLabel: 'พร้อมเครื่องยนต์ OUTBOARD', hullLabel: 'เฉพาะตัวเรือ ไม่มีเครื่องยนต์',
       items: B.flatMap(([m, o]) => [boat(m, 'hull', o), boat(m, 'eng', o)]),
     },
     floodwall: {
@@ -92,6 +92,35 @@
         { img: './assets/accessories/control-cabinet.png', title: 'ตู้ควบคุมการจ่ายกระแสไฟฟ้า', contain: true, bg: '#A0A0A1' },
         { img: './assets/accessories/cable-reel.png', title: 'ชุดม้วนสายเคเบิลไฟฟ้า 4 ชุด', contain: false, bg: '' },
         { img: './assets/accessories/hoses.png', title: 'สายส่งน้ำ 12 นิ้ว 4 เส้น พร้อมหัวต่อ เส้นละ 100 ม.', contain: false, bg: '' },
+      ],
+    },
+    articles: {
+      eyebrow: 'บทความ', title: 'ความรู้เตรียมรับมือน้ำท่วม', more: 'อ่านต่อ', back: '← กลับหน้าแรก', otherTitle: 'บทความอื่น ๆ',
+      items: [
+        {
+          id: 'A-prep', date: '10 ต.ค. 2569', img: './assets/kts-hero-banner-v2.png',
+          title: 'เตรียมพื้นที่ให้พร้อมก่อนน้ำมา: เช็กลิสต์สำหรับหน่วยงานท้องถิ่น',
+          excerpt: 'ช่วงก่อนฤดูน้ำหลากคือเวลาที่ดีที่สุดในการสำรวจจุดเสี่ยง ตรวจอุปกรณ์ และซ้อมแผน ลองใช้เช็กลิสต์นี้เป็นจุดเริ่มต้น',
+          body: 'ความเสียหายจากน้ำท่วมหลายครั้งลดลงได้มาก หากหน่วยงานเตรียมตัวล่วงหน้าตั้งแต่ก่อนฤดูน้ำหลาก บทความนี้รวบรวมขั้นตอนพื้นฐานที่หน่วยงานปกครองส่วนท้องถิ่นนำไปปรับใช้ได้ทันที\n\nเริ่มจากสำรวจพื้นที่เสี่ยง ระบุชุมชนที่น้ำท่วมซ้ำทุกปี เส้นทางน้ำไหล และจุดที่ต้องกั้นน้ำหรือสูบระบายเป็นพิเศษ แล้วทำแผนที่อย่างง่ายให้ทีมงานทุกคนเข้าใจตรงกัน\n\nต่อมาให้ตรวจสภาพอุปกรณ์ที่มีอยู่ เช่น เรือ เครื่องยนต์ เครื่องสูบน้ำ และแนวกั้นน้ำ ทดลองเดินเครื่องจริง เปลี่ยนชิ้นส่วนที่เสื่อมสภาพ และจัดเก็บไว้ในจุดที่นำออกใช้งานได้เร็ว\n\nสุดท้ายคือซ้อมแผนร่วมกับหน่วยกู้ภัยและผู้นำชุมชน กำหนดผู้รับผิดชอบ ช่องทางสื่อสาร และจุดอพยพให้ชัดเจน การซ้อมเพียงปีละครั้งก็ช่วยให้การทำงานจริงราบรื่นขึ้นมาก',
+        },
+        {
+          id: 'A-boat', date: '10 ต.ค. 2569', img: './assets/kts-boat.png',
+          title: 'เลือกเรือท้องแบนอลูมิเนียมให้เหมาะกับภารกิจกู้ภัย',
+          excerpt: 'ขนาดเรือ ความสูงขอบ และกำลังเครื่องยนต์ ส่งผลต่อความปลอดภัยและจำนวนผู้ประสบภัยที่ขนย้ายได้ในแต่ละเที่ยว',
+          body: 'เรือท้องแบนเป็นอุปกรณ์หลักในการช่วยเหลือและอพยพผู้ประสบภัย การเลือกรุ่นให้เหมาะกับสภาพพื้นที่จะช่วยให้ทำงานได้ปลอดภัยและคุ้มค่ากว่า\n\nเรือขนาดเล็กประมาณ 4–5 เมตร เคลื่อนที่ในซอยแคบและบริเวณบ้านเรือนได้คล่องตัว ส่วนเรือขนาด 6 เมตรขึ้นไป รองรับผู้โดยสารและสิ่งของได้มากกว่า เหมาะกับการขนย้ายระยะไกลหรือพื้นที่น้ำลึก\n\nควรพิจารณาความสูงขอบเรือด้วย ขอบที่สูงช่วยลดโอกาสน้ำเข้าเรือเมื่อบรรทุกหนักหรือเจอคลื่น ส่วนหัวเรือแบบวีช่วยแหวกน้ำและทรงตัวได้ดีในกระแสน้ำแรง\n\nสำหรับเครื่องยนต์ ให้เลือกกำลังให้สัมพันธ์กับขนาดเรือและน้ำหนักบรรทุก หากพื้นที่มีกระแสน้ำเชี่ยว ควรเผื่อกำลังเครื่องไว้มากกว่าปกติ',
+        },
+        {
+          id: 'A-wall', date: '10 ต.ค. 2569', img: './assets/kts-barrier.png',
+          title: 'ติดตั้งกำแพงกั้นน้ำ FLOODWALL อย่างไรให้กั้นน้ำได้ดี',
+          excerpt: 'แนวกั้นน้ำแบบประกอบติดตั้งได้เร็ว แต่จะกั้นน้ำได้ดีแค่ไหนขึ้นกับการเตรียมพื้นและการวางแนวต่อ',
+          body: 'กำแพงกั้นน้ำแบบประกอบได้รับความนิยม เพราะขนย้ายสะดวก ติดตั้งได้เร็ว และเก็บกลับมาใช้ซ้ำได้ แต่ต้องติดตั้งให้ถูกวิธีจึงจะกั้นน้ำได้เต็มประสิทธิภาพ\n\nก่อนติดตั้ง ให้เก็บเศษหิน ทราย และสิ่งกีดขวางบนพื้นออก พื้นที่เรียบช่วยให้ฐานของแนวกั้นแนบสนิทและลดการรั่วซึมใต้แนว\n\nวางแนวกั้นให้ต่อเนื่องและล็อกแต่ละชิ้นให้แน่น บริเวณที่ต้องเลี้ยวหรือทำแนวโค้ง ให้ใช้ชิ้นส่วนที่ออกแบบมาสำหรับมุม และตรวจรอยต่อทุกจุดอีกครั้งหลังวางเสร็จ\n\nเมื่อน้ำลดแล้ว ให้ทำความสะอาดชิ้นส่วนและผึ่งให้แห้งก่อนจัดเก็บ จะช่วยยืดอายุการใช้งานและพร้อมนำออกใช้ในครั้งต่อไป',
+        },
+        {
+          id: 'A-pump', date: '10 ต.ค. 2569', img: './assets/kts-pump.png',
+          title: 'ดูแลเครื่องสูบระบายน้ำเคลื่อนที่ให้พร้อมใช้ทุกฤดูฝน',
+          excerpt: 'เครื่องสูบน้ำที่ถูกเก็บไว้ทั้งปีควรได้รับการตรวจเช็กก่อนถึงฤดูฝน เพื่อให้เดินเครื่องได้ทันทีเมื่อถึงเวลาจำเป็น',
+          body: 'เครื่องสูบระบายน้ำเคลื่อนที่ช่วยเร่งระบายน้ำออกจากพื้นที่ชุมชนได้อย่างรวดเร็ว แต่หากไม่ได้ดูแลระหว่างปี อาจเกิดปัญหาตอนต้องใช้งานจริง\n\nควรเดินเครื่องทดสอบเป็นระยะ ตรวจระบบไฟฟ้า ตู้ควบคุม และสายเคเบิลว่าไม่มีรอยชำรุด รวมทั้งตรวจตีนตะขาบหรือระบบขับเคลื่อนให้พร้อมเคลื่อนที่ในพื้นที่โคลน\n\nสายส่งน้ำและหัวต่อเป็นจุดที่มักถูกมองข้าม ให้ตรวจรอยแตก รอยรั่ว และความแน่นของข้อต่อ เพราะการรั่วเพียงเล็กน้อยทำให้ประสิทธิภาพการสูบลดลงมาก\n\nหลังใช้งานทุกครั้ง ให้ล้างทำความสะอาด ระบายน้ำค้างออก และบันทึกชั่วโมงการทำงาน เพื่อวางแผนบำรุงรักษาตามรอบได้อย่างเหมาะสม',
+        },
       ],
     },
     cta: { title: 'ต้องการราคาและเอกสารคุณลักษณะเฉพาะ?', text: 'กรอกรายละเอียดหน่วยงาน เจ้าหน้าที่จะส่งใบเสนอราคาภายใน 1 วันทำการ', button: 'ขอใบเสนอราคา' },
@@ -130,18 +159,95 @@
   };
   const clone = o => o === undefined ? undefined : JSON.parse(JSON.stringify(o));
 
+  // ---------- server API (Vercel functions in /api) ----------
+  // When the API answers (it always sends X-KTS-API), content lives in Vercel Blob and saving publishes for everyone.
+  // Without it (local preview via serve.ps1) everything falls back to content.json + this browser's IndexedDB, as before.
+  let remote = null; // null = not checked yet
+  const TOKEN = 'kts-admin-token';
+  const token = () => { try { return sessionStorage.getItem(TOKEN) || ''; } catch (e) { return ''; } };
+  const isApi = r => r.headers.get('X-KTS-API') === '1';
+  const authErr = () => Object.assign(new Error('login required'), { auth: true });
+  async function api(method, path, body) {
+    const r = await fetch('/api/' + path, {
+      method, cache: 'no-store',
+      headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + token() },
+      body: body === undefined ? undefined : JSON.stringify(body),
+    });
+    if (r.status === 401) throw authErr();
+    const j = await r.json().catch(() => ({}));
+    if (!r.ok) throw new Error(j.error || `HTTP ${r.status}`);
+    return j;
+  }
+  async function readPublished() {
+    try { const r = await fetch('./content.json', { cache: 'no-cache' }); if (r.ok) return await r.json(); } catch (e) {}
+    return null;
+  }
+  // Replace every embedded data: image with an uploaded Blob URL (each image is sent on its own to stay under request limits).
+  async function uploadImages(o, done = new Map()) {
+    if (typeof o === 'string') {
+      if (!o.startsWith('data:image/')) return o;
+      if (!done.has(o)) done.set(o, (await api('POST', 'upload', { dataUrl: o })).url);
+      return done.get(o);
+    }
+    if (Array.isArray(o)) { const r = []; for (const v of o) r.push(await uploadImages(v, done)); return r; }
+    if (isObj(o)) { const r = {}; for (const k in o) r[k] = await uploadImages(o[k], done); return r; }
+    return o;
+  }
+
   window.KTSCMS = {
     DEFAULTS, clone,
-    // Published content (content.json in the repo) is what every visitor sees; a newer local admin save wins on that browser only.
-    async load() {
-      let local = null, pub = null;
+    isRemote: () => remote === true,
+    // strict (admin): fail instead of showing a fallback, so an older copy can never be saved over the live content
+    async load({ fresh = false, strict = false } = {}) {
+      let r = null;
+      try { r = await fetch('/api/content' + (fresh ? '?fresh=1' : ''), { cache: fresh ? 'no-store' : 'default' }); } catch (e) {}
+      if (r && isApi(r)) {
+        remote = true;
+        if (r.ok) return merge(DEFAULTS, await r.json());
+        // 404 = nothing saved to Blob yet: show the repo's content.json until the first save migrates it
+        if (r.status === 404) return merge(DEFAULTS, (await readPublished()) || {});
+        if (strict) throw new Error(`โหลดเนื้อหาไม่สำเร็จ (HTTP ${r.status})`);
+        return merge(DEFAULTS, (await readPublished()) || {});
+      }
+      if (strict && remote) throw new Error('เชื่อมต่อเซิร์ฟเวอร์ไม่ได้');
+      remote = false;
+      // Published content (content.json in the repo) is what every visitor sees; a newer local admin save wins on that browser only.
+      let local = null;
       try { local = await get('content'); } catch (e) {}
-      try { const r = await fetch('./content.json', { cache: 'no-cache' }); if (r.ok) pub = await r.json(); } catch (e) {}
+      const pub = await readPublished();
       const v = local && (!pub || (local.updatedAt || '') > (pub.updatedAt || '')) ? local : pub;
       return merge(DEFAULTS, v || {});
     },
-    async save(c) { c.updatedAt = new Date().toISOString(); await set('content', clone(c)); ping('content'); return c.updatedAt; },
-    async reset() { await set('content', null); ping('content'); },
+    // Returns the saved content (images replaced by their uploaded URLs when on the server).
+    async save(c) {
+      if (remote) {
+        const out = await uploadImages(clone(c));
+        const { updatedAt } = await api('PUT', 'content', out);
+        ping('content');
+        return { ...out, updatedAt };
+      }
+      const out = { ...clone(c), updatedAt: new Date().toISOString() };
+      await set('content', out); ping('content'); return out;
+    },
+    async reset() {
+      if (remote) { await api('PUT', 'content', {}); ping('content'); return; }
+      await set('content', null); ping('content');
+    },
+    // true = signed in, false = wrong password; throws when the server isn't configured
+    async login(pw) {
+      const r = await fetch('/api/login', { method: 'POST', cache: 'no-store', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ password: pw }) }).catch(() => null);
+      if (r && isApi(r)) {
+        remote = true;
+        if (r.status === 401) return false;
+        const j = await r.json().catch(() => ({}));
+        if (!r.ok) throw new Error(j.error || `HTTP ${r.status}`);
+        try { sessionStorage.setItem(TOKEN, j.token); } catch (e) {}
+        return true;
+      }
+      return pw === await this.getPassword();
+    },
+    logout() { try { sessionStorage.removeItem(TOKEN); } catch (e) {} },
+    hasSession: () => !!token(),
     async listRequests() { try { return (await get('requests')) || []; } catch (e) { return []; } },
     async saveRequests(l) { await set('requests', l); ping('requests'); },
     async addRequest(r) { const l = await this.listRequests(); l.unshift(r); await this.saveRequests(l); },

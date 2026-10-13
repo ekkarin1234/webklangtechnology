@@ -110,6 +110,7 @@ img{max-width:100%}
 .boat-model .lbl{background:#0B2E8F;color:#FFFFFF;padding:3px 14px;transform:skewX(-18deg);font-family:'Kanit',sans-serif;font-weight:700;font-size:17px}
 .boat-model .lbl > span{display:inline-block;transform:skewX(18deg)}
 .mold{position:absolute;top:16px;right:16px;background:#FFFFFF;border:1.5px solid #D32F2F;color:#D32F2F;padding:3px 10px;border-radius:999px;font-family:'Kanit',sans-serif;font-weight:600;font-size:13px;pointer-events:none;white-space:nowrap}
+.mold.wait{border-color:#B26A00;color:#B26A00}
 .boat-body{padding:22px 24px 24px;display:flex;flex-direction:column;gap:16px;flex:1;border-top:1px solid #EEF2F9}
 .boat-title{display:flex;flex-direction:column;gap:8px}
 .badge-eng{align-self:flex-start;background:#FFB400;color:#0B1B4F;padding:2px 10px;border-radius:4px;font-size:13px;font-weight:600}
@@ -181,6 +182,42 @@ img{max-width:100%}
 .cta-copy h2{margin:0;font-family:'Kanit',sans-serif;font-weight:700;font-size:clamp(28px,3.4vw,40px);line-height:1.25;text-wrap:balance}
 .cta-copy p{margin:0;font-size:17px;color:#C9D6F2}
 .cta .btn-yellow{padding:16px 30px;font-size:17px}
+
+/* Articles */
+.articles{scroll-margin-top:70px;background:#FFFFFF}
+.articles > .wrap{padding-top:96px;padding-bottom:104px;display:flex;flex-direction:column;gap:40px}
+.articles-head{display:flex;flex-direction:column;gap:14px}
+.art-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:24px}
+.art-grid.three{grid-template-columns:repeat(3,minmax(0,1fr))}
+.art-card{background:#FFFFFF;border-radius:14px;overflow:hidden;display:flex;flex-direction:column;box-shadow:0 1px 2px rgba(11,46,143,0.08),0 12px 32px rgba(11,46,143,0.08);transition:transform .2s}
+.art-card:hover{transform:translateY(-4px)}
+.art-media{display:block;border:none;padding:0;cursor:pointer;aspect-ratio:16/10;background:#E4ECF8;overflow:hidden}
+.art-media img{width:100%;height:100%;object-fit:cover;display:block}
+.art-body{padding:20px 20px 22px;display:flex;flex-direction:column;gap:10px;flex:1}
+.art-date{font-size:13px;color:#6B7690}
+.art-body h3{margin:0;font-family:'Kanit',sans-serif;font-weight:600;font-size:18px;line-height:1.4;text-wrap:balance}
+.art-body h3 button{border:none;background:none;padding:0;text-align:left;cursor:pointer;font:inherit;color:#0B2E8F}
+.art-body h3 button:hover{color:#1846C9}
+.art-body p{margin:0;font-size:14px;line-height:1.7;color:#4A5675;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+.art-more{margin-top:auto;align-self:flex-start;border:none;background:none;padding:6px 0 0;cursor:pointer;font-family:'Kanit',sans-serif;font-weight:600;font-size:15px;color:#0B2E8F;border-bottom:2px solid #FFB400}
+.art-more:hover{color:#1846C9}
+@media (max-width:1080px){.art-grid,.art-grid.three{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:600px){.art-grid,.art-grid.three{grid-template-columns:minmax(0,1fr)}}
+
+.article-page{background:#F2F6FC;padding-bottom:96px}
+.wrap.narrow{max-width:860px;padding-top:40px;display:flex;flex-direction:column;gap:28px}
+.art-back-link{align-self:flex-start;border:none;background:none;padding:0;cursor:pointer;font-family:'Kanit',sans-serif;font-size:15px;color:#0B2E8F}
+.art-back-link:hover{color:#1846C9}
+.art-head{display:flex;flex-direction:column;gap:14px}
+.art-head h1{margin:0;font-family:'Kanit',sans-serif;font-weight:700;font-size:clamp(28px,4vw,42px);line-height:1.3;color:#0B2E8F;text-wrap:balance}
+.art-hero{border-radius:14px;overflow:hidden;background:#E4ECF8;aspect-ratio:16/9}
+.art-hero img{width:100%;height:100%;object-fit:cover;display:block}
+.art-content{background:#FFFFFF;border-radius:14px;padding:36px 40px;box-shadow:0 1px 2px rgba(11,46,143,0.06)}
+.art-content p{margin:0 0 1.2em;font-size:17px;line-height:1.9;color:#2B3654;text-wrap:pretty;white-space:pre-line}
+.art-content p:last-child{margin-bottom:0}
+.art-others{padding-top:72px;display:flex;flex-direction:column;gap:24px}
+.art-others h2{margin:0;font-family:'Kanit',sans-serif;font-weight:700;font-size:28px;color:#0B2E8F}
+@media (max-width:600px){.art-content{padding:24px 20px}}
 
 /* Quote page */
 .quote-page{background:#F2F6FC;min-height:80vh}
