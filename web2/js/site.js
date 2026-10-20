@@ -386,33 +386,61 @@ ${others.length ? `<div class="wrap art-others">
     refreshQty();
   }
 
+  // ---------- Google Analytics (GA4) ----------
+  // The Measurement ID comes from the admin (content.analytics.gaId), so it can be set or changed without a code deploy.
+  // Page views are sent manually because home / quote / article pages are all rendered inside index.html.
+  let gaId = '';
+  window.dataLayer = window.dataLayer || [];
+  function gtag() { window.dataLayer.push(arguments); }
+  function setupAnalytics(id) {
+    id = String(id || '').trim().toUpperCase();
+    if (gaId || !/^G-[A-Z0-9]{4,}$/.test(id) || /^(localhost|127\.0\.0\.1)$/.test(location.hostname)) return;
+    gaId = id;
+    const s = document.createElement('script');
+    s.async = true; s.src = 'https://www.googletagmanager.com/gtag/js?id=' + encodeURIComponent(id);
+    document.head.appendChild(s);
+    gtag('js', new Date());
+    gtag('config', id, { send_page_view: false });
+    trackPage();
+  }
+  function trackPage() {
+    if (!gaId) return;
+    const path = state.page === 'quote' ? '/quote' : state.page === 'article' ? '/article/' + state.articleId : '/';
+    gtag('event', 'page_view', { page_title: document.title, page_location: location.origin + path, page_path: path });
+  }
+  const trackEvent = (name, params) => { if (gaId) gtag('event', name, params || {}); };
+
   // Article pages live at #article/<id> so they can be linked to and the browser Back button works.
   const ARTICLE_HASH = /^#article\/(.+)$/;
   const leaveArticleHash = () => { if (ARTICLE_HASH.test(location.hash)) history.pushState(null, '', location.pathname + location.search); };
   function route() {
     const m = location.hash.match(ARTICLE_HASH);
-    if (m) { state.page = 'article'; state.articleId = decodeURIComponent(m[1]); }
+    if (m) {
+      const id = decodeURIComponent(m[1]);
+      if (state.page === 'article' && state.articleId === id) return true; // hashchange + popstate both fire for one navigation
+      state.page = 'article'; state.articleId = id;
+    }
     else if (state.page === 'article') { // browser Back: return to the article cards
-      state.page = 'home'; render();
+      state.page = 'home'; render(); trackPage();
       // run after the browser's own scroll restoration for the history entry
       const toCards = () => { const el = document.getElementById('articles'); if (el) window.scrollTo({ top: el.getBoundingClientRect().top + window.scrollY - 70, behavior: 'instant' }); };
       toCards(); setTimeout(toCards, 60);
       return true;
     }
     else return false;
-    render(); window.scrollTo({ top: 0, behavior: 'instant' });
+    render(); window.scrollTo({ top: 0, behavior: 'instant' }); trackPage();
     return true;
   }
   window.addEventListener('hashchange', route);
   window.addEventListener('popstate', route);
 
-  function go(page) { leaveArticleHash(); state.page = page; render(); window.scrollTo({ top: 0, behavior: 'instant' }); }
+  function go(page) { leaveArticleHash(); const changed = state.page !== page; state.page = page; render(); window.scrollTo({ top: 0, behavior: 'instant' }); if (changed) trackPage(); }
 
   function navTo(id) {
     leaveArticleHash();
     const jump = behavior => { const el = document.getElementById(id); if (el) window.scrollTo({ top: el.getBoundingClientRect().top + window.scrollY - 70, behavior }); };
     if (state.page === 'home') { jump('smooth'); return; }
-    state.page = 'home'; render();
+    state.page = 'home'; render(); trackPage();
     requestAnimationFrame(() => jump('instant'));
     setTimeout(() => jump('instant'), 400);
   }
@@ -492,6 +520,7 @@ ${others.length ? `<div class="wrap art-others">
       return;
     }
     window.KTSCMS.addRequest(req).catch(() => {});
+    trackEvent('generate_lead', { lead_source: 'quote_form', items: req.items.length, org_type: req.orgType || '' });
     state.sent = true; state.refNo = ref;
     render(); window.scrollTo({ top: 0, behavior: 'instant' });
   });
@@ -503,8 +532,8 @@ ${others.length ? `<div class="wrap art-others">
   const reload = () => window.KTSCMS.load().then(c => {
     state.c = c;
     // don't wipe what someone has typed into the quote form; new content shows on the next page change
-    if (state.page === 'quote' && !state.sent) { refreshQty(); return; }
-    render();
+    if (state.page === 'quote' && !state.sent) refreshQty(); else render();
+    setupAnalytics(c.analytics && c.analytics.gaId);
   });
   reload();
   window.KTSCMS.subscribe(m => { if (m.type === 'content') reload(); });

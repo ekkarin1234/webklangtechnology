@@ -85,6 +85,9 @@
       L('quote.orgTypes', 'ตัวเลือกประเภทหน่วยงาน', '1 บรรทัด = 1 ตัวเลือก'), L('quote.docs', 'ตัวเลือกเอกสารที่ต้องการ', '1 บรรทัด = 1 ตัวเลือก (บรรทัดแรกติ๊กไว้ให้)'),
       T('quote.successTitle', 'ข้อความเมื่อส่งสำเร็จ'), A('quote.successText', 'รายละเอียดเมื่อส่งสำเร็จ', '', 2),
     ] },
+    { key: 'analytics', label: 'Google Analytics', desc: 'วาง Measurement ID จาก Google Analytics (Admin → Data streams → เลือกเว็บ) แล้วกดบันทึก ระบบจะติด Google tag ให้ทุกหน้าโดยอัตโนมัติ · เว้นว่างเพื่อปิด', fields: [
+      T('analytics.gaId', 'Measurement ID', 'รูปแบบ G-XXXXXXXXXX'),
+    ] },
     { key: 'contact', label: 'ข้อมูลติดต่อ · Footer', fields: [
       T('contact.company', 'ชื่อบริษัท'), T('contact.phone', 'เบอร์โทร'), T('contact.email', 'อีเมล'), T('contact.copyright', 'ข้อความลิขสิทธิ์'), A('contact.address', 'ที่อยู่', '', 2),
     ] },

@@ -94,6 +94,7 @@
         { img: './assets/accessories/hoses.png', title: 'สายส่งน้ำ 12 นิ้ว 4 เส้น พร้อมหัวต่อ เส้นละ 100 ม.', contain: false, bg: '' },
       ],
     },
+    analytics: { gaId: '' },
     articles: {
       eyebrow: 'บทความ', title: 'ความรู้เตรียมรับมือน้ำท่วม', more: 'อ่านต่อ', back: '← กลับหน้าแรก', otherTitle: 'บทความอื่น ๆ',
       items: [
